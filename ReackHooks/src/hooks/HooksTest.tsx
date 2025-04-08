@@ -4,6 +4,7 @@ import {
     useComponentWillUnmount,
     useComponentDidUpdate,
     useComponentWillMount,
+    useInterval,
 } from './'
 function Unmount(props: { cnt: number }) {
     const { cnt } = props
@@ -98,6 +99,7 @@ function HooksTest() {
 
     return (
         <div>
+            <Timer />
             <button onClick={() => setCnt(cnt + 1)}>add</button>
             <button onClick={() => setCnt(cnt - 1)}>sub</button>
             <>父组件中 {cnt}</>
@@ -106,6 +108,16 @@ function HooksTest() {
             {show && <UnmountClass cnt={cnt} />}
         </div>
     )
+}
+
+function Timer() {
+    const [time, setCount] = useState(new Date().toLocaleTimeString())
+
+    useInterval(() => {
+        setCount(new Date().toLocaleTimeString())
+    }, 1000)
+
+    return <div>定时器: {time}</div>
 }
 
 export default HooksTest
