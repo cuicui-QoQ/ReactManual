@@ -1,0 +1,11 @@
+{
+    "name": "ReactManual",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +"
+    },
+    "repository": "git@github.com:cuicui-QoQ/ReactManual.git",
+    "author": "cuicui <wyg.scut@qq.com>",
+    "license": "MIT"
+}
