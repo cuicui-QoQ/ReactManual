@@ -7,9 +7,13 @@
     "version": "1.0.0",
     "main": "index.js",
     "scripts": {
+        "create-package": "node scripts/create-package.js",
         "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +"
     },
     "repository": "git@github.com:cuicui-QoQ/ReactManual.git",
     "author": "cuicui <wyg.scut@qq.com>",
-    "license": "MIT"
+    "license": "MIT",
+    "dependencies": {
+        "commander": "^13.1.0"
+    }
 }
