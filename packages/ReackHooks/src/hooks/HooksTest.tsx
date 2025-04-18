@@ -5,7 +5,7 @@ import {
     useComponentDidUpdate,
     useComponentWillMount,
     useInterval,
-} from './'
+} from '.'
 function Unmount(props: { cnt: number }) {
     const { cnt } = props
     const [innerCnt, setInnerCnt] = useState(cnt)
