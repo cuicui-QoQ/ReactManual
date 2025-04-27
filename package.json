@@ -9,6 +9,7 @@
     "scripts": {
         "create-package": "node scripts/create-package.js",
         "clean": "find . -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
+        "prepare": "husky install",
         "lerna": "npm run use-npm-registry && lerna publish && npm run use-taobao-registry",
         "use-npm-registry": "npm config set registry https://registry.npmjs.org ",
         "use-taobao-registry": "npm config set registry https://registry.npmmirror.com/ "
@@ -20,6 +21,9 @@
         "commander": "^13.1.0"
     },
     "devDependencies": {
+        "@commitlint/cli": "^12.1.4",
+        "@commitlint/config-conventional": "^12.1.4",
+        "husky": "^7.0.1",
         "cz-customizable": "^7.4.0",
         "lerna": "^8.2.2"
     },

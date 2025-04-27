@@ -50,5 +50,7 @@ module.exports = {
         footer: '列举出所有变更的 ISSUES(可选):\n',
         confirmCommit: '确认使用以上信息提交？(y/n)',
     },
+    // 跳过步骤
+    // skipQuestion: ['body', 'footer'],
     subjectLimit: 100,
 }
