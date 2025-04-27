@@ -22,18 +22,13 @@ const ImgLazy = ({ dataSrc }) => {
             return () => {
                 if (imgRef.current) {
                     observer.unobserve(imgRef.current)
+                    observer.disconnect()
                 }
             }
         }
     }, [])
 
-    return (
-        <img
-            ref={imgRef}
-            data-src="https://img2.baidu.com/it/u=210843546,3566921899&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=889"
-            alt="Lazy loaded"
-        />
-    )
+    return <img ref={imgRef} data-src={dataSrc} alt="Lazy loaded" />
 }
 
 export default ImgLazy
