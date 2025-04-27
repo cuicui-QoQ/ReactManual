@@ -20,6 +20,12 @@
         "commander": "^13.1.0"
     },
     "devDependencies": {
+        "cz-customizable": "^7.4.0",
         "lerna": "^8.2.2"
+    },
+    "config": {
+        "commitizen": {
+            "path": "./node_modules/cz-customizable"
+        }
     }
 }
