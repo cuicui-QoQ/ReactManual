@@ -1,6 +1,6 @@
 {
-  "name": "lg-react-snake",
-  "private": true,
+  "name": "cui-react-snake",
+  "private": false,
   "version": "0.0.3",
   "type": "module",
   "scripts": {
