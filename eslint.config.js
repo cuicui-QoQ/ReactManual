@@ -17,4 +17,9 @@ export default [
             eqeqeq: [1, 'always'],
         },
     },
+    {
+        languageOptions: {
+            globals: globals.node
+        }
+    }
 ]

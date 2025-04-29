@@ -70,11 +70,15 @@ fs.mkdirSync(path.join(packagePath, 'src'))
 fs.writeFileSync(
     path.join(packagePath, 'src', 'index.tsx'),
     `import React from 'react';
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client';
 
 const App = () => <h1>Hello, ${options.name}!</h1>;
 
-ReactDOM.render(<App />, document.getElementById('root'));`,
+const container = document.getElementById('root');
+if (container) {
+  const root = createRoot(container);
+  root.render(<App />);
+}`,
 )
 
 // 创建 index.html
