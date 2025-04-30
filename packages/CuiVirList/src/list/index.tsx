@@ -21,8 +21,9 @@ const List = () => {
         if (!containerRef.current) return;
 
         const scrollTop = containerRef.current.scrollTop;
-        const startIndex = Math.floor(scrollTop / itemHeight);
-        const endIndex = startIndex + Math.ceil(containerRef.current.clientHeight / itemHeight);
+        const buffer = 5; // 缓冲区项目数
+        const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - buffer);
+        const endIndex = startIndex + Math.ceil(containerRef.current.clientHeight / itemHeight) + buffer;
 
         setVisibleItems(list.slice(startIndex, endIndex + 1));
     }
