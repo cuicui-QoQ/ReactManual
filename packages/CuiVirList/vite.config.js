@@ -5,6 +5,14 @@ import path from 'path'
 export default defineConfig({
     plugins: [react()],
     root: './',
+    server: {
+        proxy: {
+            '/api': {
+                target: 'https://api.pexels.com/v1',
+                changeOrigin: true
+            }
+        }
+    },
     resolve: {
         alias: {
             '@': path.resolve(__dirname, '/src'),
