@@ -33,13 +33,25 @@ const List = () => {
     }, [])
 
     useEffect(() => {
+        let ticking = false;
+
+        const handleScroll = () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    updateVisibleItems();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        }
+
         if (containerRef.current) {
-            containerRef.current.addEventListener('scroll', updateVisibleItems);
-            updateVisibleItems(); // 初始渲染
+            containerRef.current.addEventListener('scroll', handleScroll);
+            updateVisibleItems();
         }
         return () => {
             if (containerRef.current) {
-                containerRef.current.removeEventListener('scroll', updateVisibleItems);
+                containerRef.current.removeEventListener('scroll', handleScroll);
             }
         }
     }, [list])
