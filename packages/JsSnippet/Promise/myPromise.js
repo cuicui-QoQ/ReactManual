@@ -14,16 +14,18 @@ class MyPromise {
     // 成功之后的值
     value = undefined
     reason = undefined
+    successCallback = undefined
+    failCallback = undefined
     constructor(executor) {
         executor(this.resolve, this.reject)
     }
 
     resolve = (value) => {
-        console.log('line 21', value)
         if (this.status == PENDING) {
             // 将状态更改为成功
             this.status = FULFILLED
             this.value = value
+            this.successCallback && this.successCallback(value)
         }
     }
 
@@ -31,28 +33,27 @@ class MyPromise {
         if (this.status == PENDING) {
             this.status = REJECTED
             this.reason = reason
+            this.failCallback && this.failCallback(reason)
         }
     }
     then(succCb, failCb) {
-        console.log('执行了then');
-        console.log('this.status', this.status);
         if (this.status == FULFILLED) {
             succCb(this.value)
         } else if (this.status == REJECTED) {
             failCb(this.reason)
+        } else {
+            // 如果异步任务没结束就调用了then方法, 需要临时存储一下成功和失败的回掉函数
+            this.failCallback = failCb
+            this.successCallback = succCb
         }
     }
 }
 
 let promise = new MyPromise((resolve, reject) => {
-    // setTimeout(() => {
-    //     const time = new Date();
-    //     console.log('line 46 执行了');
-    //     resolve(200 + ' '+ time.toLocaleTimeString() + ' ' + time.toLocaleDateString());
-    // }, 1000);
-
-    const time = new Date();
-    resolve(200 + ' '+ time.toLocaleTimeString() + ' ' + time.toLocaleDateString());
+    setTimeout(() => {
+        const time = new Date();
+        resolve(200 + ' '+ time.toLocaleTimeString() + ' ' + time.toLocaleDateString());
+    }, 1000);
 })
 
 promise.then(res => {
