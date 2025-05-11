@@ -14,8 +14,8 @@ class MyPromise {
     // 成功之后的值
     value = undefined
     reason = undefined
-    successCallback = undefined
-    failCallback = undefined
+    successCallbackList = []
+    failCallbackList = []
     constructor(executor) {
         executor(this.resolve, this.reject)
     }
@@ -25,7 +25,11 @@ class MyPromise {
             // 将状态更改为成功
             this.status = FULFILLED
             this.value = value
-            this.successCallback && this.successCallback(value)
+            // 特别注意，这个cb是消耗品，执行一个销毁一个
+            while(this.successCallbackList.length) {
+                const cb = this.successCallbackList.shift()
+                cb(value)
+            }
         }
     }
 
@@ -33,7 +37,11 @@ class MyPromise {
         if (this.status == PENDING) {
             this.status = REJECTED
             this.reason = reason
-            this.failCallback && this.failCallback(reason)
+            // 特别注意，这个cb是消耗品，执行一个销毁一个
+            while(this.failCallbackList.length) {
+                const cb = this.failCallbackList.shift()
+                cb(value)
+            }
         }
     }
     then(succCb, failCb) {
@@ -43,8 +51,8 @@ class MyPromise {
             failCb(this.reason)
         } else {
             // 如果异步任务没结束就调用了then方法, 需要临时存储一下成功和失败的回掉函数
-            this.failCallback = failCb
-            this.successCallback = succCb
+            this.failCallbackList.push(failCb);
+            this.successCallbackList.push(succCb);
         }
     }
 }
@@ -57,7 +65,13 @@ let promise = new MyPromise((resolve, reject) => {
 })
 
 promise.then(res => {
-    console.log('inthen',res)
-}, reason => {
+    console.log('inthen 1',res)
+})
 
+promise.then(res => {
+    console.log('inthen 2',res)
+})
+
+promise.then(res => {
+    console.log('inthen 3',res)
 })
