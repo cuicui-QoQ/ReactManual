@@ -37,7 +37,7 @@ class MyPromise {
         }, 1000);
         */
        try {
-        executor(this.resolve, this.reject)
+            executor(this.resolve, this.reject)
        } catch(e) {
             // 增加错误处理
             this.reject(e);
@@ -73,11 +73,17 @@ class MyPromise {
             if (this.status == FULFILLED) {
                 // 这里写成异步代码，主要是为了防止 promise2 拿不到值，因为new是在执行器之后
                 setTimeout(() => {
-                    let x = succCb(this.value)
-                    // 判断x的值是普通值还是promise对象
-                    // 如果是普通值，直接调用resolve
-                    // 如果是 promise对象，则查看 promise对象的返回结果，根据结果决定调用resolve，还是reject。
-                    resolvePromise(promise2, x, res, rej);
+                    try {
+
+                        let x = succCb(this.value)
+                        // 判断x的值是普通值还是promise对象
+                        // 如果是普通值，直接调用resolve
+                        // 如果是 promise对象，则查看 promise对象的返回结果，根据结果决定调用resolve，还是reject。
+                        resolvePromise(promise2, x, res, rej);
+                    } catch (e) {
+                        // 这里捕获当前的then中的错误，传递给下一个
+                        rej(e)
+                    }
                 }, 0)
             } else if (this.status == REJECTED) {
                 failCb(this.reason)
@@ -174,12 +180,34 @@ let syncPromise = new MyPromise(resolve => {
 //     console.log('reason: ', reason);
 // })
 
-const errorPromise = new MyPromise((res, rej) => {
-    throw new Error('exec error')
-})
-errorPromise.then(value => {
-    console.log('value: ', value);
-}, reason => {
-    console.log('reason: ', reason);
-})
 
+/**********************
+ *
+ * 下面这里是处理promise中在构造期间抛出error的问题
+ *
+ *********************/
+// const errorPromise = new MyPromise((res, rej) => {
+//     throw new Error('exec error')
+// })
+// errorPromise.then(value => {
+//     console.log('value: ', value);
+// }, reason => {
+//     console.log('reason: ', reason);
+// })
+
+
+/**********************
+ *
+ * 下面这里是处理promise中在then期间抛出error的问题
+ *
+ *********************/
+// new MyPromise((res) => {
+//     res('成功')
+// }).then(val => {
+//     console.log('在Promise中resolve的值', val)
+//     throw new Error('then error')
+// }).then(val => {
+//     console.log('then的回调函数中的then', val);
+// }, reason => {
+//     console.log('then的回调函数中的error', reason);
+// })
