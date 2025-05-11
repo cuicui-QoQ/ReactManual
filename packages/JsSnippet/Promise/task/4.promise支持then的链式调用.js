@@ -48,15 +48,35 @@ class MyPromise {
         }
     }
 }
+function test() {
+    let syncPromise = new MyPromise((res, rej) => {
+        res('syncPromise')
+    })
+    syncPromise.then(res=> {
+        console.log('inthen 1',res)
+        return 100
+    }).then(res => {
+        console.log(res);
+    })
 
-let syncPromise = new MyPromise((res, rej) => {
-    res('syncPromise')
-})
+    new MyPromise((res, rej) => {
+        res('syncPromise')
+    }).then(res => {
+        console.log('inthen 1: ',res)
+        return new MyPromise((res, rej) => {
+            res('other');
+        })
+    }).then(res => {
+        console.log('link 1: ', res);
+    })
+    /**
+     * 期望输出
 
-syncPromise.then(res=> {
-    console.log('inthen 1',res)
-    return 100
-}).then(res => {
-    console.log(res);
-})
+    inthen 1 syncPromise
+    100
+    inthen 1:  syncPromise
+    link 1:  other
+    */
+}
 
+test()
