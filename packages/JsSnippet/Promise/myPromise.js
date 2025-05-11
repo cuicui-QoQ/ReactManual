@@ -68,7 +68,7 @@ class MyPromise {
             }
         }
     }
-    then(succCb, failCb) {
+    then(succCb = val => val, failCb = reason =>{ throw reason }) {
         let promise2 = new MyPromise((res, rej) => {
             if (this.status == FULFILLED) {
                 // 这里写成异步代码，主要是为了防止 promise2 拿不到值，因为new是在执行器之后
