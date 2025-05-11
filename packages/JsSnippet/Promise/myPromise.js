@@ -36,7 +36,12 @@ class MyPromise {
             this.resolve(200 + ' '+ time.toLocaleTimeString() + ' ' + time.toLocaleDateString());
         }, 1000);
         */
+       try {
         executor(this.resolve, this.reject)
+       } catch(e) {
+            // 增加错误处理
+            this.reject(e);
+       }
     }
 
     resolve = (value) => {
@@ -143,7 +148,7 @@ let syncPromise = new MyPromise(resolve => {
 
 /**********************
  *
- * 下面这里是then的链式调用
+ * 下面这里是then的链式调用 -- 返回Promise的情况
  *
  *********************/
 // syncPromise.then(res => {
@@ -155,10 +160,26 @@ let syncPromise = new MyPromise(resolve => {
 //     console.log('link 1: ', res);
 // })
 
-let p1 = syncPromise.then(val => {
-    return p1
-})
 
-p1.then(val => {}, reason => {
+/**********************
+ *
+ * 下面这里是处理promise中then的循环调用的问题
+ *
+ *********************/
+// let p1 = syncPromise.then(val => {
+//     return p1
+// })
+
+// p1.then(val => {}, reason => {
+//     console.log('reason: ', reason);
+// })
+
+const errorPromise = new MyPromise((res, rej) => {
+    throw new Error('exec error')
+})
+errorPromise.then(value => {
+    console.log('value: ', value);
+}, reason => {
     console.log('reason: ', reason);
 })
+
