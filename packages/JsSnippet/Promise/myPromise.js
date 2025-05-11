@@ -17,6 +17,25 @@ class MyPromise {
     successCallbackList = []
     failCallbackList = []
     constructor(executor) {
+        // executor 是一个函数，下面这里的代码，是把Promise内部的res和rej，在下面
+        // exec = (res, rej) => { }
+        // 这个函数上执行调用 exec(res, rej)
+        /**
+         *
+        以这个为例
+        new MyPromise((resolve, reject) => {
+            setTimeout(() => {
+                const time = new Date();
+                resolve(200 + ' '+ time.toLocaleTimeString() + ' ' + time.toLocaleDateString());
+            }, 1000);
+        })
+
+        脑洞编译之后如下：
+        setTimeout(() => {
+            const time = new Date();
+            this.resolve(200 + ' '+ time.toLocaleTimeString() + ' ' + time.toLocaleDateString());
+        }, 1000);
+        */ 
         executor(this.resolve, this.reject)
     }
 
