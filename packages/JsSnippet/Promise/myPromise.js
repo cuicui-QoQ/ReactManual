@@ -35,7 +35,7 @@ class MyPromise {
             const time = new Date();
             this.resolve(200 + ' '+ time.toLocaleTimeString() + ' ' + time.toLocaleDateString());
         }, 1000);
-        */ 
+        */
         executor(this.resolve, this.reject)
     }
 
@@ -64,17 +64,41 @@ class MyPromise {
         }
     }
     then(succCb, failCb) {
-        if (this.status == FULFILLED) {
-            succCb(this.value)
-        } else if (this.status == REJECTED) {
-            failCb(this.reason)
-        } else {
-            // 如果异步任务没结束就调用了then方法, 需要临时存储一下成功和失败的回掉函数
-            this.failCallbackList.push(failCb);
-            this.successCallbackList.push(succCb);
-        }
+        let promise2 = new MyPromise((res, rej) => {
+            if (this.status == FULFILLED) {
+                // 这里写成异步代码，主要是为了防止 promise2 拿不到值，因为new是在执行器之后
+                setTimeout(() => {
+                    let x = succCb(this.value)
+                    // 判断x的值是普通值还是promise对象
+                    // 如果是普通值，直接调用resolve
+                    // 如果是 promise对象，则查看 promise对象的返回结果，根据结果决定调用resolve，还是reject。
+                    resolvePromise(promise2, x, res, rej);
+                }, 0)
+            } else if (this.status == REJECTED) {
+                failCb(this.reason)
+            } else {
+                // 如果异步任务没结束就调用了then方法, 需要临时存储一下成功和失败的回掉函数
+                this.failCallbackList.push(failCb);
+                this.successCallbackList.push(succCb);
+            }
+        });
+        return promise2;
     }
 }
+
+function resolvePromise(promise2, x, resolve, reject) {
+    if (promise2 === x) {
+        return reject(new TypeError('不允许循环调用Promise'))
+    }
+    if(x instanceof MyPromise) {
+        // x.then((val) => resolve(val), reason => reject(reason))
+        // 两种写法一致
+        x.then(resolve, reject)
+    } else {
+        resolve(x);
+    }
+}
+
 
 let promise = new MyPromise((resolve, reject) => {
     setTimeout(() => {
@@ -83,14 +107,58 @@ let promise = new MyPromise((resolve, reject) => {
     }, 1000);
 })
 
-promise.then(res => {
-    console.log('inthen 1',res)
+let syncPromise = new MyPromise(resolve => {
+    const time = new Date();
+    resolve(200 + ' '+ time.toLocaleTimeString() + ' ' + time.toLocaleDateString());
+})
+/**********************
+ *
+ * 下面这里是then的多次调用
+ *
+ *********************/
+// promise.then(res => {
+//     console.log('inthen 1',res)
+// })
+
+// promise.then(res => {
+//     console.log('inthen 2',res)
+// })
+
+// promise.then(res => {
+//     console.log('inthen 3',res)
+// })
+
+
+/**********************
+ *
+ * 下面这里是then的链式调用
+ *
+ *********************/
+// syncPromise.then(res=> {
+//     console.log('inthen 1',res)
+//     return 100
+// }).then(res => {
+//     console.log(res);
+// })
+
+/**********************
+ *
+ * 下面这里是then的链式调用
+ *
+ *********************/
+// syncPromise.then(res => {
+//     console.log('inthen 1: ',res)
+//     return new MyPromise((res, rej) => {
+//         res('other');
+//     })
+// }).then(res => {
+//     console.log('link 1: ', res);
+// })
+
+let p1 = syncPromise.then(val => {
+    return p1
 })
 
-promise.then(res => {
-    console.log('inthen 2',res)
-})
-
-promise.then(res => {
-    console.log('inthen 3',res)
+p1.then(val => {}, reason => {
+    console.log('reason: ', reason);
 })
