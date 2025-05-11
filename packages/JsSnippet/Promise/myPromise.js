@@ -59,7 +59,7 @@ class MyPromise {
             // 特别注意，这个cb是消耗品，执行一个销毁一个
             while(this.failCallbackList.length) {
                 const cb = this.failCallbackList.shift()
-                cb(value)
+                cb(reason)
             }
         }
     }
