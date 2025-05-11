@@ -52,7 +52,7 @@ class MyPromise {
             // 特别注意，这个cb是消耗品，执行一个销毁一个
             while(this.successCallbackList.length) {
                 const cb = this.successCallbackList.shift()
-                cb(value)
+                cb()
             }
         }
     }
@@ -64,7 +64,7 @@ class MyPromise {
             // 特别注意，这个cb是消耗品，执行一个销毁一个
             while(this.failCallbackList.length) {
                 const cb = this.failCallbackList.shift()
-                cb(reason)
+                cb()
             }
         }
     }
@@ -74,7 +74,6 @@ class MyPromise {
                 // 这里写成异步代码，主要是为了防止 promise2 拿不到值，因为new是在执行器之后
                 setTimeout(() => {
                     try {
-
                         let x = succCb(this.value)
                         // 判断x的值是普通值还是promise对象
                         // 如果是普通值，直接调用resolve
@@ -86,11 +85,48 @@ class MyPromise {
                     }
                 }, 0)
             } else if (this.status == REJECTED) {
-                failCb(this.reason)
+                setTimeout(() => {
+                    try {
+                        let x = failCb(this.reason)
+                        // 判断x的值是普通值还是promise对象
+                        // 如果是普通值，直接调用resolve
+                        // 如果是 promise对象，则查看 promise对象的返回结果，根据结果决定调用resolve，还是reject。
+                        resolvePromise(promise2, x, res, rej);
+                    } catch (e) {
+                        // 这里捕获当前的then中的错误，传递给下一个
+                        rej(e)
+                    }
+                }, 0)
             } else {
                 // 如果异步任务没结束就调用了then方法, 需要临时存储一下成功和失败的回掉函数
-                this.failCallbackList.push(failCb);
-                this.successCallbackList.push(succCb);
+                this.failCallbackList.push(() => {
+                    setTimeout(() => {
+                        try {
+                            let x = failCb(this.reason)
+                            // 判断x的值是普通值还是promise对象
+                            // 如果是普通值，直接调用resolve
+                            // 如果是 promise对象，则查看 promise对象的返回结果，根据结果决定调用resolve，还是reject。
+                            resolvePromise(promise2, x, res, rej);
+                        } catch (e) {
+                            // 这里捕获当前的then中的错误，传递给下一个
+                            rej(e)
+                        }
+                    }, 0)
+                });
+                this.successCallbackList.push(() => {
+                    setTimeout(() => {
+                        try {
+                            let x = succCb(this.value)
+                            // 判断x的值是普通值还是promise对象
+                            // 如果是普通值，直接调用resolve
+                            // 如果是 promise对象，则查看 promise对象的返回结果，根据结果决定调用resolve，还是reject。
+                            resolvePromise(promise2, x, res, rej);
+                        } catch (e) {
+                            // 这里捕获当前的then中的错误，传递给下一个
+                            rej(e)
+                        }
+                    }, 0)
+                });
             }
         });
         return promise2;
@@ -210,4 +246,20 @@ let syncPromise = new MyPromise(resolve => {
 //     console.log('then的回调函数中的then', val);
 // }, reason => {
 //     console.log('then的回调函数中的error', reason);
+// })
+
+/**********************
+ *
+ * 下面这里是处理promise中在then期间抛出error的问题
+ *
+ *********************/
+// new MyPromise((res, rej) => {
+//     setTimeout(() => {
+//         rej('失败')
+//     }, 2000);
+// }).then(res => {}, rej => {
+//     console.log('错误异常应该到这里', rej)
+//     return 10000
+// }).then(res => {
+//     console.log('这里因为 前一个then中，rej了10000，所以: ', res);
 // })
