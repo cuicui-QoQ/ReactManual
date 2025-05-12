@@ -169,6 +169,25 @@ class MyPromise {
             })
         }
     }
+
+
+    // 没看懂这里
+    // finally = (cb) => {
+    //     return this.then(value => {
+    //         return MyPromise.resolve(cb()).then(() => value)
+    //     }, reason => {
+    //         return MyPromise.resolve(cb()).then(() => { throw reason })
+    //     })
+    // }
+    finally = (cb) => {
+            cb && cb()
+            return this
+    }
+
+    catch = (cb) => {
+        return this.then(undefined, cb)
+    }
+
 }
 
 module.exports = MyPromise
