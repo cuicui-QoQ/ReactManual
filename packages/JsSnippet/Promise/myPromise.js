@@ -131,6 +131,34 @@ class MyPromise {
         });
         return promise2;
     }
+
+    static all = (arr) => {
+        let ans = [];
+        let cnt = 0;
+        return new MyPromise((res, rej) => {
+            for (let i = 0; i < arr.length; i++) {
+                let current = arr[i];
+                if (current instanceof MyPromise) {
+                    cnt++;
+                    try {
+                        current.then(value => {
+                            cnt--
+                            ans[i] = value
+                            if (!cnt) {
+                                res(ans);
+                            }
+                        }, reason => {
+                            rej(reason)
+                        })
+                    } catch(e) {
+                        rej(e)
+                    }
+                } else {
+                    ans[i] = current
+                }
+            }
+        })
+    }
 }
 
 module.exports = MyPromise
