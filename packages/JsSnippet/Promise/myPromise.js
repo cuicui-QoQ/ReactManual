@@ -159,6 +159,16 @@ class MyPromise {
             }
         })
     }
+
+    static resolve = (value) => {
+        if (value instanceof MyPromise) {
+            return value
+        } else {
+            return new MyPromise((res, rej) => {
+                res(value)
+            })
+        }
+    }
 }
 
 module.exports = MyPromise
